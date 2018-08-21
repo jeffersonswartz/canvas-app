@@ -1,0 +1,65 @@
+<mat-toolbar>
+  <mat-toolbar-row fxLayoutAlign="space-between center">
+    <div class="logo-container" fxLayout="row" fxLayoutAlign="start center">
+      <mat-icon class="logo">gesture</mat-icon>
+      <div>Canvas Draw</div>
+    </div>
+    <div fxLayout="row">
+      <button mat-raised-button color="accent" [matMenuTriggerFor]="menu" *ngIf="name">{{name}}</button>
+      <mat-menu #menu="matMenu" overlapTrigger="false">
+        <button mat-menu-item (click)="logout()">Logout</button>
+      </mat-menu>
+    </div>
+  </mat-toolbar-row>
+  <mat-toolbar-row class="hAuto toolbar">
+    <!-- <button mat-icon-button matTooltip="Undo">
+      <mat-icon class="toolbar-icon">undo</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Redo">
+      <mat-icon class="toolbar-icon">redo</mat-icon>
+    </button>
+    <div class="toolbar-separator"></div> -->
+    <button mat-icon-button matTooltip="Draw" [color]="shape == 'free' ? 'accent' : ''" (click)="setShape('free')">
+      <mat-icon class="toolbar-icon">create</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Line" [color]="shape == 'line' ? 'accent' : ''" (click)="setShape('line')">
+      <mat-icon class="toolbar-icon">show_chart</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Circle" [color]="shape == 'circle' ? 'accent' : ''" (click)="setShape('circle')">
+      <mat-icon class="toolbar-icon">radio_button_unchecked</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Square" [color]="shape == 'square' ? 'accent' : ''" (click)="setShape('square')">
+      <mat-icon class="toolbar-icon">check_box_outline_blank</mat-icon>
+    </button>
+    <div class="toolbar-separator"></div>
+    <button mat-icon-button matTooltip="Fill" [color]="fill ? 'accent' : ''" (click)="fill = !fill">
+      <mat-icon class="toolbar-icon">format_paint</mat-icon>
+    </button>
+    <div class="toolbar-separator"></div>
+    <button mat-icon-button matTooltip="Stroke Color" [(colorPicker)]="strokeColor" [style.color]="strokeColor">
+      <mat-icon class="toolbar-icon">border_color</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Fill Color" [(colorPicker)]="fillColor" [style.color]="fillColor">
+      <mat-icon class="toolbar-icon">format_color_fill</mat-icon>
+    </button>
+    <div class="toolbar-separator"></div>
+    <button mat-icon-button matTooltip="Erase" [color]="shape == 'erase' ? 'accent' : ''" (click)="setShape('erase')">
+      <mat-icon class="toolbar-icon">video_label</mat-icon>
+    </button>
+    <div class="toolbar-separator"></div>
+    <mat-icon class="toolbar-icon" matTooltip="Stroke Width">border_outer</mat-icon>
+    <mat-slider [(ngModel)]="strokeWidth" [min]="2" [max]="72" [step]="8" [tickInterval]="8"></mat-slider>
+    <div class="mr5">{{strokeWidth}}</div>
+    <div class="toolbar-separator"></div>
+    <div class="ml15">Online:</div> 
+    <div class="ml15" fxLayout="row">
+        <div class="users mr5" fxLayoutAlign="center center" [style.background]='userColors[random]' [matTooltip]="users[key]" *ngFor="let key of objectKeys(users)">
+            <div>{{users[key]?.substr(0, 1)}}</div>
+        </div>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-card>
+  <app-canvas [width]="400" [height]="400" [shape]="shape" [fill]="fill" [strokeColor]="strokeColor" [fillColor]="fillColor"
+    [strokeWidth]="strokeWidth" #appCanvas></app-canvas>
+</mat-card>

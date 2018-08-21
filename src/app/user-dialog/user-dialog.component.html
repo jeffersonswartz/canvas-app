@@ -1,0 +1,14 @@
+
+<div mat-dialog-title>
+  Join the Party!
+</div>
+<div mat-dialog-content>
+  <mat-form-field color="accent">
+    <input matInput [(ngModel)]="name" placeholder="What's your name?" required (keyup.enter)="addUser()">
+    <mat-error *ngIf="!name">Name is Required</mat-error>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="accent" (click)="addUser()">Join</button>
+</div>
+

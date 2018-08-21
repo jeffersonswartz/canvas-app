@@ -1,0 +1,47 @@
+.toolbar-icon{
+    padding: 8px;
+}
+.toolbar{
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+.mat-toolbar{
+    background: #ffffff !important;
+}
+.logo{
+    font-size: 50px !important;
+    height: 50px;
+    width: 50px;
+}
+.users{
+    -webkit-background-size: 32px 32px;
+    background-size: 32px 32px;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+    height: 32px;
+    width: 32px;
+    z-index: 0;
+    text-transform: uppercase;
+}
+
+.toolbar-separator{
+    border-left: 1px solid #ccc;
+    height: 17px;
+    line-height: normal;
+    list-style: none;
+    margin: 0 2px;
+    outline: none;
+    overflow: hidden;
+    padding: 0;
+    text-decoration: none;
+    vertical-align: middle;
+    width: 0;
+}
+.mat-card{
+    padding: 0 !important;
+    margin: 20px;
+}
