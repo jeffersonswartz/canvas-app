@@ -1,5 +1,7 @@
 # Canvas App
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jeffersonswartz/canvas-app.svg)](https://greenkeeper.io/)
+
 Canvas App is a collabrative drawing tool that enables the users to draw collabratively between their browsers
 
 
