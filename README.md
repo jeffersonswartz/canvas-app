@@ -1,4 +1,6 @@
 # Canvas App
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app?ref=badge_shield)
+
 
 Canvas App is a collabrative drawing tool that enables the users to draw collabratively between their browsers
 
@@ -32,3 +34,7 @@ $ node server.js
 Goto URL localhost:3000
 ```
  That's it.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app?ref=badge_large)
