@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
 
   random = Math.floor(Math.random() * 6) + 1 ;
 
-  @ViewChild('appCanvas') appCanvas: CanvasComponent;
+  @ViewChild('appCanvas', { static: true }) appCanvas: CanvasComponent;
 
   constructor(public dialog: MatDialog, public socket: Socket) { }
 
