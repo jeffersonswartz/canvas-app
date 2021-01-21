@@ -27,7 +27,7 @@
     "ngx-color-picker": "^6.6.0",
     "ngx-socket-io": "^3.0.1",
     "rxjs": "^6.0.0",
-    "socket.io": "^2.1.1",
+    "socket.io": "^2.4.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
