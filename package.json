@@ -28,9 +28,9 @@
     "core-js": "^2.5.4",
     "express": "^4.16.3",
     "ngx-color-picker": "^6.6.0",
-    "ngx-socket-io": "^3.4.0",
+    "ngx-socket-io": "^4.2.0",
     "rxjs": "^6.0.0",
-    "socket.io": "^2.1.1",
+    "socket.io": "^4.5.1",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"
   },
@@ -42,7 +42,6 @@
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
-    "webpack-dev-server": ">=3.1.11",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -54,6 +53,7 @@
     "protractor": "~7.0.0",
     "ts-node": "~5.0.1",
     "tslint": "~6.1.0",
-    "typescript": "~4.7.3"
+    "typescript": "~4.7.3",
+    "webpack-dev-server": "^4.9.1"
   }
 }
