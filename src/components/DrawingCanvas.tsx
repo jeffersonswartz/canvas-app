@@ -170,6 +170,7 @@ export function DrawingCanvas({ socket, settings, enabled, children }: DrawingCa
     const stroke: Stroke = {
       id: createId(),
       tool: settings.tool,
+      brush: settings.brush,
       strokeColor: settings.strokeColor,
       fillColor: settings.fillColor,
       fill: settings.fill,

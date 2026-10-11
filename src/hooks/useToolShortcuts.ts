@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { TOOL_DEFINITIONS, stepBrushSize } from '../lib/tools';
+import { TOOL_DEFINITIONS, nextBrush, stepBrushSize } from '../lib/tools';
 import type { ToolSettings } from '../lib/tools';
 
 /**
- * Single-key shortcuts: a tool's letter selects it, F toggles fill and
- * [ / ] change the brush size. Ignored while typing in a field.
+ * Single-key shortcuts: a tool's letter selects it, F toggles fill, B cycles
+ * brushes and [ / ] change the brush size. Ignored while typing in a field.
  */
 export function useToolShortcuts(
   settings: ToolSettings,
@@ -34,6 +34,7 @@ export function useToolShortcuts(
       const tool = TOOL_DEFINITIONS.find((t) => t.shortcut === key)?.tool;
       if (tool) change({ tool });
       else if (key === 'F') change({ fill: !current.fill });
+      else if (key === 'B') change({ brush: nextBrush(current.brush) });
       else if (key === '[') change({ width: stepBrushSize(current.width, -1) });
       else if (key === ']') change({ width: stepBrushSize(current.width, 1) });
     };

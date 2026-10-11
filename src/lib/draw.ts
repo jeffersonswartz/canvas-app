@@ -1,4 +1,5 @@
-import type { Point, Stroke } from '../../shared/protocol';
+import type { Brush, Point, Stroke } from '../../shared/protocol';
+import { paintBrush, seedFrom } from './brushes';
 
 /** The paper colour; erase previews are painted with it. Keep in sync with --paper. */
 export const PAPER_COLOR = '#fbfaf6';
@@ -43,6 +44,12 @@ export function drawStroke(
   const [start] = stroke.points;
   if (!start) return;
   const end = stroke.points[stroke.points.length - 1] ?? start;
+
+  const brush: Brush = stroke.tool === 'erase' ? 'ink' : (stroke.brush ?? 'ink');
+  if (brush !== 'ink') {
+    drawTextured(ctx, stroke, brush, start, end);
+    return;
+  }
 
   ctx.save();
   ctx.lineWidth = stroke.width;
@@ -91,6 +98,68 @@ export function drawStroke(
   }
 
   ctx.restore();
+}
+
+/**
+ * The path a stroke's line follows: the pen's points, a line's two ends, or
+ * a shape's closed outline.
+ */
+export function strokeOutline(stroke: Stroke, start: Point, end: Point): Point[] {
+  switch (stroke.tool) {
+    case 'free':
+    case 'erase':
+      return stroke.points;
+    case 'line':
+      return [start, end];
+    case 'circle': {
+      const radius = distance(start, end);
+      const steps = Math.max(24, Math.ceil((Math.PI * 2 * radius) / 6));
+      return Array.from({ length: steps + 1 }, (_, i) => {
+        const angle = (i / steps) * Math.PI * 2;
+        return { x: start.x + Math.cos(angle) * radius, y: start.y + Math.sin(angle) * radius };
+      });
+    }
+    case 'square': {
+      const { x, y, width, height } = squareFromDrag(start, end);
+      return [
+        { x, y },
+        { x: x + width, y },
+        { x: x + width, y: y + height },
+        { x, y: y + height },
+        { x, y },
+      ];
+    }
+  }
+}
+
+/** Draws a stroke with a textured brush; shapes get a flat fill first. */
+function drawTextured(
+  ctx: CanvasRenderingContext2D,
+  stroke: Stroke,
+  brush: Brush,
+  start: Point,
+  end: Point,
+) {
+  const outline = strokeOutline(stroke, start, end);
+  const isShape = stroke.tool === 'circle' || stroke.tool === 'square';
+
+  if (isShape && stroke.fill) {
+    ctx.save();
+    ctx.fillStyle = stroke.fillColor;
+    // Crayon can't lay down solid colour; a lighter fill keeps it waxy.
+    if (brush === 'crayon') ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    outline.forEach((point, i) => (i === 0 ? ctx.moveTo : ctx.lineTo).call(ctx, point.x, point.y));
+    ctx.fill();
+    ctx.restore();
+  }
+
+  paintBrush(ctx, outline, {
+    brush,
+    color: stroke.strokeColor,
+    width: stroke.width,
+    seed: seedFrom(stroke.id),
+  });
 }
 
 /** Filled shapes are filled and then outlined, so both colours show. */

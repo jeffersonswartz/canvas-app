@@ -51,3 +51,23 @@ describe('StyleBar', () => {
     );
   });
 });
+
+describe('StyleBar brushes', () => {
+  it('picks a brush', async () => {
+    const onChange = vi.fn();
+    render(<StyleBar settings={DEFAULT_TOOL_SETTINGS} onChange={onChange} />);
+
+    expect(screen.getByRole('radio', { name: 'Ink pen' })).toBeChecked();
+    await userEvent.click(screen.getByRole('radio', { name: 'Crayon' }));
+
+    expect(onChange).toHaveBeenCalledWith({ brush: 'crayon' });
+  });
+
+  it('marks brushes as not applying to the eraser', () => {
+    render(<StyleBar settings={{ ...DEFAULT_TOOL_SETTINGS, tool: 'erase' }} onChange={vi.fn()} />);
+    expect(screen.getByRole('radiogroup', { name: 'Brush' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+});

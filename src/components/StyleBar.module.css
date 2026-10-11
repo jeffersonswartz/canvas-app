@@ -35,6 +35,35 @@
   padding-right: 2px;
 }
 
+/* Brushes */
+.brush {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.brush:hover {
+  background: var(--hover);
+}
+
+.brush[aria-checked='true'] {
+  background: var(--hover);
+  box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.brushes[aria-disabled='true'] .brush {
+  opacity: 0.35;
+}
+
 /* Stroke / fill target chips */
 .targets {
   display: flex;
@@ -149,7 +178,8 @@
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
 }
 
-/* On narrow screens the bar wraps onto two rows instead of scrolling. */
+/* On narrow screens the bar wraps onto rows instead of scrolling:
+   brushes and colour targets, then swatches, then sizes. */
 @media (max-width: 640px) {
   .bar {
     bottom: 10px;
@@ -164,13 +194,17 @@
     padding: 0 4px;
   }
 
-  .section:nth-child(2) {
-    order: 3;
+  .swatches,
+  .sizes {
     width: 100%;
     justify-content: center;
     padding-top: 4px;
-    border-left: 0;
+    border-left: 0 !important;
     border-top: 1px solid var(--line);
+  }
+
+  .brush {
+    width: 44px;
   }
 
   .swatch {

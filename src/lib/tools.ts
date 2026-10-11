@@ -1,7 +1,9 @@
-import type { Tool } from '../../shared/protocol';
+import { BRUSHES } from '../../shared/protocol';
+import type { Brush, Tool } from '../../shared/protocol';
 
 export interface ToolSettings {
   tool: Tool;
+  brush: Brush;
   fill: boolean;
   strokeColor: string;
   fillColor: string;
@@ -38,6 +40,7 @@ export const BRUSH_SIZES = [2, 4, 8, 16, 32];
 
 export const DEFAULT_TOOL_SETTINGS: ToolSettings = {
   tool: 'free',
+  brush: 'ink',
   fill: false,
   strokeColor: '#1c1a17',
   fillColor: '#e3a42b',
@@ -48,4 +51,9 @@ export const DEFAULT_TOOL_SETTINGS: ToolSettings = {
 export function stepBrushSize(width: number, step: 1 | -1): number {
   if (step > 0) return BRUSH_SIZES.find((size) => size > width) ?? width;
   return [...BRUSH_SIZES].reverse().find((size) => size < width) ?? width;
+}
+
+/** The brush after `brush`, wrapping around. */
+export function nextBrush(brush: Brush): Brush {
+  return BRUSHES[(BRUSHES.indexOf(brush) + 1) % BRUSHES.length] ?? 'ink';
 }

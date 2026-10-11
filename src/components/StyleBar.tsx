@@ -1,7 +1,9 @@
 import { PaintBucket, Plus } from 'lucide-react';
 import { useState } from 'react';
 import type { CSSProperties } from 'react';
+import { BRUSH_INFO } from '../lib/brushes';
 import { BRUSH_SIZES, PALETTE } from '../lib/tools';
+import { BrushPreview } from './BrushPreview';
 import type { ToolSettings } from '../lib/tools';
 import styles from './StyleBar.module.css';
 
@@ -12,11 +14,12 @@ interface StyleBarProps {
   onChange: (changes: Partial<ToolSettings>) => void;
 }
 
-/** Colours, fill and brush size for the next stroke. */
+/** Brush, colours, fill and brush size for the next stroke. */
 export function StyleBar({ settings, onChange }: StyleBarProps) {
   const [target, setTarget] = useState<ColorTarget>('stroke');
   const current = target === 'stroke' ? settings.strokeColor : settings.fillColor;
   const isCustom = !PALETTE.some(({ color }) => color === current);
+  const brushApplies = settings.tool !== 'erase';
 
   const pickColor = (color: string) => {
     if (target === 'stroke') onChange({ strokeColor: color });
@@ -26,7 +29,32 @@ export function StyleBar({ settings, onChange }: StyleBarProps) {
 
   return (
     <div className={styles.bar} role="toolbar" aria-label="Style">
-      <div className={styles.section}>
+      <div
+        className={`${styles.section} ${styles.brushes}`}
+        role="radiogroup"
+        aria-label="Brush"
+        aria-disabled={!brushApplies}
+      >
+        {BRUSH_INFO.map(({ brush, label }) => (
+          <button
+            key={brush}
+            type="button"
+            role="radio"
+            aria-checked={settings.brush === brush}
+            aria-label={label}
+            aria-keyshortcuts="B"
+            data-tip={brushApplies ? label : `${label} (not used by the eraser)`}
+            data-key={brushApplies ? 'B' : ''}
+            data-tip-side="top"
+            className={styles.brush}
+            onClick={() => onChange({ brush })}
+          >
+            <BrushPreview brush={brush} color={settings.strokeColor} />
+          </button>
+        ))}
+      </div>
+
+      <div className={`${styles.section} ${styles.colorTargets}`}>
         <div className={styles.targets} role="radiogroup" aria-label="Colour applies to">
           <button
             type="button"
@@ -73,7 +101,7 @@ export function StyleBar({ settings, onChange }: StyleBarProps) {
       </div>
 
       <div
-        className={styles.section}
+        className={`${styles.section} ${styles.swatches}`}
         role="radiogroup"
         aria-label={target === 'stroke' ? 'Stroke colour' : 'Fill colour'}
       >
@@ -109,7 +137,11 @@ export function StyleBar({ settings, onChange }: StyleBarProps) {
         </label>
       </div>
 
-      <div className={styles.section} role="radiogroup" aria-label="Brush size">
+      <div
+        className={`${styles.section} ${styles.sizes}`}
+        role="radiogroup"
+        aria-label="Brush size"
+      >
         {BRUSH_SIZES.map((size) => (
           <button
             key={size}

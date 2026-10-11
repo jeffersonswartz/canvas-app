@@ -9,6 +9,10 @@ import { z } from 'zod';
 export const TOOLS = ['free', 'line', 'circle', 'square', 'erase'] as const;
 export type Tool = (typeof TOOLS)[number];
 
+/** How a stroke's line is painted. Ignored by the eraser. */
+export const BRUSHES = ['ink', 'matte', 'oil', 'crayon'] as const;
+export type Brush = (typeof BRUSHES)[number];
+
 /** Freehand tools record every point; shape tools only a start and an end. */
 export const isFreehand = (tool: Tool): boolean => tool === 'free' || tool === 'erase';
 
@@ -28,13 +32,15 @@ const strokeId = z.string().min(1).max(64);
 export const strokeSchema = z.object({
   id: strokeId,
   tool: z.enum(TOOLS),
+  // Optional on the wire so clients from before brushes existed still work.
+  brush: z.enum(BRUSHES).default('ink'),
   strokeColor: color,
   fillColor: color,
   fill: z.boolean(),
   width: z.number().min(MIN_STROKE_WIDTH).max(MAX_STROKE_WIDTH),
   points: z.array(pointSchema).min(1).max(MAX_POINTS_PER_MESSAGE),
 });
-export type Stroke = z.infer<typeof strokeSchema>;
+export type Stroke = z.output<typeof strokeSchema>;
 
 export const strokeExtendSchema = z.object({
   id: strokeId,

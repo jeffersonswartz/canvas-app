@@ -5,6 +5,7 @@ import type { Stroke } from './protocol';
 const stroke = (overrides: Partial<Stroke> = {}): Stroke => ({
   id: 's1',
   tool: 'free',
+  brush: 'ink',
   strokeColor: '#000000',
   fillColor: '#ffffff',
   fill: false,
@@ -53,12 +54,19 @@ describe('strokeSchema', () => {
     expect(strokeSchema.safeParse(stroke()).success).toBe(true);
   });
 
+  it('defaults the brush for clients that do not send one', () => {
+    const withoutBrush: Partial<Stroke> = stroke({ brush: 'oil' });
+    delete withoutBrush.brush;
+    expect(strokeSchema.parse(withoutBrush).brush).toBe('ink');
+  });
+
   it.each([
     ['an unknown tool', { tool: 'spray' }],
     ['a non-hex colour', { strokeColor: 'red' }],
     ['a huge width', { width: 1000 }],
     ['no points', { points: [] }],
     ['a non-finite coordinate', { points: [{ x: Number.NaN, y: 0 }] }],
+    ['an unknown brush', { brush: 'spray' }],
   ])('rejects %s', (_, overrides) => {
     expect(strokeSchema.safeParse({ ...stroke(), ...overrides }).success).toBe(false);
   });

@@ -18,6 +18,7 @@ type Client = Socket<ServerToClientEvents, ClientToServerEvents>;
 const stroke: Stroke = {
   id: 's1',
   tool: 'free',
+  brush: 'ink',
   strokeColor: '#ff0000',
   fillColor: '#000000',
   fill: false,

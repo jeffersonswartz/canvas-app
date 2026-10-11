@@ -6,6 +6,8 @@ Canvas App is a collaborative drawing board: everyone who opens the page draws o
 and strokes appear in each other's browsers in real time.
 
 - Pen, line, circle, square and eraser tools, with keyboard shortcuts
+- Four brushes for the pen, lines and shape outlines: ink, matte gouache, oil paint and crayon.
+  Their textures are seeded per stroke, so every viewer sees exactly the same marks
 - A palette of eight inks plus a custom colour picker, separate stroke and fill colours, and five
   brush sizes
 - Live cursors with name tags for everyone else on the board
@@ -120,7 +122,8 @@ src/
     DrawingCanvas.tsx   Pointer input, brush preview, sending strokes and cursor
     RemoteCursors.tsx   Other people's cursors with name tags
     ToolRail.tsx        Tool picker and clear board (left)
-    StyleBar.tsx        Colours, fill and brush size (bottom)
+    StyleBar.tsx        Brush, colours, fill and brush size (bottom)
+    BrushPreview.tsx    Live sample of each brush in the current colour
     TopBar.tsx          Wordmark, connection status, people, leave
     OnlineUsers.tsx     Stacked avatars
     JoinDialog.tsx      Name prompt showing who is already drawing
@@ -132,6 +135,7 @@ src/
   lib/
     BoardRenderer.ts    Two-layer canvas renderer
     draw.ts             Pure drawing functions for each tool
+    brushes.ts          Ink, matte, oil and crayon textures (deterministic)
     socket.ts           Typed socket factory
 ```
 

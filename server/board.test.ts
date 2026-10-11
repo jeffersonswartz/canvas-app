@@ -5,6 +5,7 @@ import type { Stroke } from '../shared/protocol';
 const stroke = (id: string, tool: Stroke['tool'] = 'free'): Stroke => ({
   id,
   tool,
+  brush: 'ink',
   strokeColor: '#000000',
   fillColor: '#000000',
   fill: false,

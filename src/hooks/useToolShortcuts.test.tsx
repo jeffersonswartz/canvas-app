@@ -22,12 +22,14 @@ describe('useToolShortcuts', () => {
     fireEvent.keyDown(window, { key: 'f' });
     fireEvent.keyDown(window, { key: ']' });
     fireEvent.keyDown(window, { key: '[' });
+    fireEvent.keyDown(window, { key: 'b' });
 
     expect(onChange.mock.calls).toEqual([
       [{ tool: 'circle' }],
       [{ fill: true }],
       [{ width: 8 }],
       [{ width: 2 }],
+      [{ brush: 'matte' }],
     ]);
   });
 
