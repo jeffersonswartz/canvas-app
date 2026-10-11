@@ -1,0 +1,27 @@
+.stack {
+  display: flex;
+  margin: 0;
+  padding: 0 0 0 6px;
+  list-style: none;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: -6px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: default;
+}
+
+.more {
+  background: var(--hover);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}

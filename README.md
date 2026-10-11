@@ -1,40 +1,165 @@
 # Canvas App
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app?ref=badge_shield)
 
+Canvas App is a collaborative drawing board: everyone who opens the page draws on the same canvas,
+and strokes appear in each other's browsers in real time.
 
-Canvas App is a collabrative drawing tool that enables the users to draw collabratively between their browsers
+- Pen, line, circle, square and eraser tools, with keyboard shortcuts
+- Four brushes for the pen, lines and shape outlines: ink, matte gouache, oil paint and crayon.
+  Their textures are seeded per stroke, so every viewer sees exactly the same marks
+- A palette of eight inks plus a custom colour picker, separate stroke and fill colours, and five
+  brush sizes
+- Live cursors with name tags for everyone else on the board
+- People who join late see the whole drawing
+- Works with a mouse, pen or touch screen, on desktop and phone layouts
+- "Clear board" wipes the canvas for everyone
 
+### Keyboard shortcuts
 
+| Key       | Action                 |
+| --------- | ---------------------- |
+| `P`       | Pen                    |
+| `L`       | Line                   |
+| `O`       | Circle                 |
+| `S`       | Square                 |
+| `E`       | Eraser                 |
+| `F`       | Toggle fill            |
+| `[` / `]` | Smaller / larger brush |
 
+## Tech stack
 
-### Installation
+| Part   | Tools                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Client | React 19, TypeScript, Vite, CSS Modules, `socket.io-client`, lucide icons, self-hosted Geist and Instrument Serif fonts |
+| Server | Node.js, Express 5, Socket.IO 4, zod (validates every incoming message)                                                 |
+| Tests  | Vitest, Testing Library, a real Socket.IO server for integration tests                                                  |
+| Checks | ESLint (typescript-eslint, react-hooks), Prettier, GitHub Actions CI                                                    |
 
-Canvas App requires [Node.js](https://nodejs.org/) v8.9+ to run.
+## Getting started
 
-Install Angular CLI globally.
+Requires Node.js 20.19 or newer.
+
 ```sh
-$ npm install -g @angular/cli
+npm install
+npm run dev
 ```
 
-Install the dependencies and devDependencies.
+Open http://localhost:5173. `npm run dev` starts the Socket.IO server (port 3000, restarts on
+changes) and the Vite dev server (hot reload), which forwards `/socket.io` to the server. Open a
+second browser window to see the drawing sync.
+
+### Production
 
 ```sh
-$ npm install
+npm run build   # client -> dist/client, server -> dist/server
+npm start       # serves the app and the socket on http://localhost:3000
 ```
 
-Build the angular code
+Environment variables:
+
+| Variable     | Default       | Meaning                             |
+| ------------ | ------------- | ----------------------------------- |
+| `PORT`       | `3000`        | Port the server listens on          |
+| `CLIENT_DIR` | `dist/client` | Folder of the built client to serve |
+
+The client always connects to the server that served the page, so no URL needs configuring.
+`GET /healthz` returns `{ "ok": true }` for load balancer health checks.
+
+## Deployment
+
+The app needs a host that runs a long-lived Node.js process with WebSockets. Static hosts
+(GitHub Pages, Netlify, Vercel) won't work. The drawing is kept in server memory, so **run exactly
+one instance**. Several instances would each have their own separate board.
+
+### Render (simplest)
+
+The repo includes a [`render.yaml`](render.yaml) Blueprint.
+
+1. Sign in at [render.com](https://render.com) with GitHub.
+2. **New → Blueprint**, pick this repository and the branch to deploy, then **Apply**.
+3. Render builds with `npm ci --include=dev && npm run build`, starts with `npm start`, and checks
+   `/healthz`. Every push to that branch deploys again.
+
+On the free plan the service sleeps after about 15 minutes without traffic. The first visit after
+that takes a while to wake it up, and the board starts empty again.
+
+### Any Docker host (Fly.io, Railway, Google Cloud Run, a VPS…)
 
 ```sh
-$ ng build
+docker build -t canvas-app .
+docker run -p 3000:3000 canvas-app
 ```
 
-Run the Node Server
-```sh
-$ node server.js
-Goto URL localhost:3000
-```
- That's it.
+The image listens on `$PORT` (default 3000) and runs as a non-root user. On Cloud Run, set the
+maximum number of instances to 1 so everyone shares one board.
 
+## Scripts
+
+| Script                      | What it does                          |
+| --------------------------- | ------------------------------------- |
+| `npm run dev`               | Server and client in watch mode       |
+| `npm run build`             | Production build of client and server |
+| `npm start`                 | Run the production build              |
+| `npm test`                  | Run all tests once                    |
+| `npm run test:watch`        | Run tests in watch mode               |
+| `npm run lint`              | ESLint                                |
+| `npm run typecheck`         | TypeScript for client, server, config |
+| `npm run format` / `:check` | Prettier write / check                |
+
+## Project layout
+
+```
+shared/protocol.ts      Event types and zod schemas shared by client and server
+server/
+  board.ts              In-memory board state: users, finished and in-progress strokes
+  socket.ts             Socket.IO event handlers (validation, broadcasting)
+  index.ts              Express + Socket.IO entry point
+src/
+  App.tsx               Layout, tool settings, join/leave
+  index.css             Design tokens (colours, type, shadows) and tooltips
+  components/
+    DrawingCanvas.tsx   Pointer input, brush preview, sending strokes and cursor
+    RemoteCursors.tsx   Other people's cursors with name tags
+    ToolRail.tsx        Tool picker and clear board (left)
+    StyleBar.tsx        Brush, colours, fill and brush size (bottom)
+    BrushPreview.tsx    Live sample of each brush in the current colour
+    TopBar.tsx          Wordmark, connection status, people, leave
+    OnlineUsers.tsx     Stacked avatars
+    JoinDialog.tsx      Name prompt showing who is already drawing
+  hooks/
+    usePresence.ts      Online users, joining on (re)connect
+    useRemoteCursors.ts Other people's cursor positions
+    useToolShortcuts.ts Keyboard shortcuts
+    useStoredName.ts    Name kept in sessionStorage for the tab
+  lib/
+    BoardRenderer.ts    Two-layer canvas renderer
+    draw.ts             Pure drawing functions for each tool
+    brushes.ts          Ink, matte, oil and crayon textures (deterministic)
+    socket.ts           Typed socket factory
+```
+
+## How it works
+
+Drawings are sent as **strokes** (tool, colours, width and points), not pixels.
+
+1. When you press the pointer, the client sends `stroke:start`. While you drag, it sends
+   `stroke:extend` with new points, batched to at most one message per animation frame. When you
+   release, it sends `stroke:end`.
+2. The server validates each message, records the stroke and forwards it to everyone else, tagged
+   with your user id. Each user's in-progress strokes are tracked separately, so several people
+   can draw at once without their lines joining up.
+3. On connecting, a client receives a `snapshot` of the users, all finished strokes (up to the most
+   recent 5,000) and any strokes in progress.
+4. Cursor positions are sent at most once per frame and relayed as volatile messages: a slow
+   connection drops stale positions instead of queueing them.
+5. The client draws on two stacked transparent canvases over a CSS dot-grid "paper", so the
+   eraser cuts ink away and the paper shows through. Finished strokes go on the bottom layer. Strokes still
+   being drawn are redrawn on the top layer each frame, so shape previews never smudge the drawing.
+   Because strokes are data, resizing the window redraws a sharp image, including on HiDPI screens.
+
+The board lives in server memory, so it is empty again after a server restart.
 
 ## License
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fjeffersonswartz%2Fcanvas-app?ref=badge_large)
