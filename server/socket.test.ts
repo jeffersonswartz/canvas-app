@@ -110,6 +110,19 @@ describe('board socket handlers', () => {
     expect(relayed).toBe(1);
   });
 
+  it('relays cursor positions and hides them when a user leaves', async () => {
+    const { client: ada } = await joinedClient('Ada');
+    const { client: bob } = await joinedClient('Bob');
+
+    const moved = once(bob, 'cursor');
+    ada.emit('cursor', { x: 10, y: 20 });
+    expect(await moved).toEqual({ userId: ada.id, point: { x: 10, y: 20 } });
+
+    const hidden = once(bob, 'cursor');
+    ada.emit('leave');
+    expect(await hidden).toEqual({ userId: ada.id, point: null });
+  });
+
   it('removes users who leave', async () => {
     const { client: ada } = await joinedClient('Ada');
     const { client: bob } = await joinedClient('Bob');

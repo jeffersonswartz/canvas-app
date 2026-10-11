@@ -1,0 +1,33 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Smooths over the gaps between network updates. */
+  transition: transform 90ms linear;
+  will-change: transform;
+}
+
+.arrow {
+  display: block;
+  margin: -1px 0 0 -1px;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.2));
+}
+
+.tag {
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}

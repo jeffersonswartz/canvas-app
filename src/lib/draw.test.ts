@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { distance, squareFromDrag } from './draw';
+import { stepBrushSize } from './tools';
 
 describe('squareFromDrag', () => {
   it('uses the longer drag distance as the side', () => {
@@ -24,5 +25,15 @@ describe('squareFromDrag', () => {
 describe('distance', () => {
   it('is the euclidean distance', () => {
     expect(distance({ x: 0, y: 0 }, { x: 3, y: 4 })).toBe(5);
+  });
+});
+
+describe('stepBrushSize', () => {
+  it('moves between the preset sizes and stops at the ends', () => {
+    expect(stepBrushSize(4, 1)).toBe(8);
+    expect(stepBrushSize(4, -1)).toBe(2);
+    expect(stepBrushSize(2, -1)).toBe(2);
+    expect(stepBrushSize(32, 1)).toBe(32);
+    expect(stepBrushSize(10, 1)).toBe(16);
   });
 });

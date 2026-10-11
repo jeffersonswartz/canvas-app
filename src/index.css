@@ -1,25 +1,39 @@
-:root {
-  --primary: #3f51b5;
-  --accent: #e91e63;
-  --accent-soft: rgb(233 30 99 / 0.12);
-  --danger: #d32f2f;
-  --surface: #ffffff;
-  --background: #eceff1;
-  --border: #dfe3e8;
-  --hover: rgb(0 0 0 / 0.06);
-  --text: #212121;
-  --text-muted: #5f6368;
-  --radius: 8px;
-  --shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+@import '@fontsource/instrument-serif/400-italic.css';
 
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  color: var(--text);
-  background: var(--background);
+:root {
+  /* Paper and ink */
+  --paper: #fbfaf6; /* keep in sync with PAPER_COLOR in src/lib/draw.ts */
+  --grid-dot: #dcd6c8;
+  --surface: #ffffff;
+  --ink: #1c1a17;
+  --ink-2: #57534a;
+  --ink-3: #8f897c;
+  --line: #e6e1d6;
+  --line-strong: #d3ccbd;
+  --hover: #f3f0e8;
+  --accent: #e5482d;
+  --accent-soft: #fdebe6;
+  --live: #3f8f4e;
+  --warn: #b7791f;
+
+  --radius-panel: 14px;
+  --radius-control: 9px;
+  --shadow-panel:
+    0 0 0 1px rgb(28 26 23 / 0.06), 0 1px 2px rgb(28 26 23 / 0.06),
+    0 8px 24px -8px rgb(28 26 23 / 0.16);
+
+  --font-ui: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  --font-display: 'Instrument Serif', Georgia, serif;
+
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
 }
 
 *,
@@ -30,11 +44,28 @@
 
 body {
   margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
 }
 
 .visually-hidden {
@@ -44,4 +75,65 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/*
+ * Tooltips: put the label in data-tip (and an optional shortcut in data-key).
+ * They appear on hover and keyboard focus, but not on touch.
+ */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]::after {
+  content: attr(data-tip) '  ' attr(data-key);
+  position: absolute;
+  z-index: 20;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: pre;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease 0ms;
+}
+
+[data-tip-side='right']::after {
+  left: calc(100% + 10px);
+  top: 50%;
+  translate: 0 -50%;
+}
+
+[data-tip-side='top']::after {
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+}
+
+[data-tip-side='bottom']::after {
+  top: calc(100% + 10px);
+  right: 0;
+}
+
+@media (hover: hover) {
+  [data-tip]:hover::after {
+    opacity: 1;
+    transition-delay: 350ms;
+  }
+}
+
+[data-tip]:focus-visible::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

@@ -1,6 +1,7 @@
 import type { Server, Socket } from 'socket.io';
 import { Board } from './board.js';
 import {
+  cursorSchema,
   strokeEndSchema,
   strokeExtendSchema,
   strokeSchema,
@@ -28,6 +29,7 @@ export function attachBoardHandlers(io: BoardServer, board = new Board()): Board
 
     const leave = () => {
       if (!board.isJoined(userId)) return;
+      socket.broadcast.emit('cursor', { userId, point: null });
       board.leave(userId).forEach((stroke) => {
         socket.broadcast.emit('stroke:end', { id: stroke.id, userId });
       });
@@ -72,6 +74,17 @@ export function attachBoardHandlers(io: BoardServer, board = new Board()): Board
         if (board.endStroke(userId, parsed.data.id)) {
           socket.broadcast.emit('stroke:end', { id: parsed.data.id, userId });
         }
+      }),
+    );
+
+    socket.on(
+      'cursor',
+      whenJoined((payload) => {
+        const parsed = cursorSchema.safeParse(payload);
+        if (!parsed.success) return;
+        // Cursor positions are only useful while fresh, so drop them rather
+        // than queue them when a client's connection is slow.
+        socket.broadcast.volatile.emit('cursor', { userId, point: parsed.data });
       }),
     );
 

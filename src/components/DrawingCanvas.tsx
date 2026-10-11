@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { PointerEvent } from 'react';
+import type { PointerEvent, ReactNode } from 'react';
 import { MAX_POINTS_PER_MESSAGE, isFreehand } from '../../shared/protocol';
 import type {
   BoardSnapshot,
@@ -19,13 +19,15 @@ interface DrawingCanvasProps {
   settings: ToolSettings;
   /** Whether the local user may draw (i.e. has joined). */
   enabled: boolean;
+  /** Rendered above the drawing, e.g. other people's cursors. */
+  children?: ReactNode;
 }
 
 const remoteKey = (userId: string, strokeId: string) => `${userId}:${strokeId}`;
 const localKey = (strokeId: string) => `local:${strokeId}`;
 
 /** The shared drawing surface: renders everyone's strokes and captures ours. */
-export function DrawingCanvas({ socket, settings, enabled }: DrawingCanvasProps) {
+export function DrawingCanvas({ socket, settings, enabled, children }: DrawingCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const baseRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -35,6 +37,11 @@ export function DrawingCanvas({ socket, settings, enabled }: DrawingCanvasProps)
   const currentRef = useRef<Stroke | null>(null);
   const pendingRef = useRef<Point[]>([]);
   const flushFrameRef = useRef<number | undefined>(undefined);
+
+  // Our pointer position for other people's screens, sent once per frame.
+  const brushRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<Point | null>(null);
+  const cursorFrameRef = useRef<number | undefined>(undefined);
 
   // Create the renderer and keep it sized to the container.
   useEffect(() => {
@@ -93,9 +100,37 @@ export function DrawingCanvas({ socket, settings, enabled }: DrawingCanvasProps)
   useEffect(
     () => () => {
       if (flushFrameRef.current !== undefined) cancelAnimationFrame(flushFrameRef.current);
+      if (cursorFrameRef.current !== undefined) cancelAnimationFrame(cursorFrameRef.current);
     },
     [],
   );
+
+  const sendCursor = (point: Point | null) => {
+    cursorRef.current = point;
+    if (point === null) {
+      if (cursorFrameRef.current !== undefined) cancelAnimationFrame(cursorFrameRef.current);
+      cursorFrameRef.current = undefined;
+      socket.emit('cursor', null);
+      return;
+    }
+    cursorFrameRef.current ??= requestAnimationFrame(() => {
+      cursorFrameRef.current = undefined;
+      if (cursorRef.current) socket.emit('cursor', cursorRef.current);
+    });
+  };
+
+  // The brush ring follows the pointer directly, without re-rendering React.
+  const moveBrush = (event: PointerEvent<HTMLCanvasElement>, point: Point) => {
+    const brush = brushRef.current;
+    if (!brush) return;
+    brush.dataset.visible = String(event.pointerType !== 'touch');
+    brush.style.transform = `translate(${point.x}px, ${point.y}px)`;
+  };
+
+  const handlePointerLeave = () => {
+    if (brushRef.current) brushRef.current.dataset.visible = 'false';
+    if (enabled) sendCursor(null);
+  };
 
   // Network updates are batched to at most one message per animation frame.
   const flush = () => {
@@ -148,8 +183,13 @@ export function DrawingCanvas({ socket, settings, enabled }: DrawingCanvasProps)
   };
 
   const handlePointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (!event.isPrimary) return;
+    const here = toPoint(event);
+    moveBrush(event, here);
+    if (enabled && event.pointerType !== 'touch') sendCursor(here);
+
     const stroke = currentRef.current;
-    if (!stroke || !event.isPrimary) return;
+    if (!stroke) return;
 
     // Coalesced events give smoother freehand lines on fast pointer moves.
     const events = event.nativeEvent.getCoalescedEvents?.() ?? [];
@@ -170,19 +210,38 @@ export function DrawingCanvas({ socket, settings, enabled }: DrawingCanvasProps)
     socket.emit('stroke:end', { id: stroke.id });
   };
 
+  const showsBrush = enabled && (settings.tool === 'free' || settings.tool === 'erase');
+  const brushSize = Math.max(settings.width, 6);
+
   return (
     <div ref={containerRef} className={styles.container}>
       <canvas ref={baseRef} className={styles.layer} aria-hidden="true" />
       <canvas
         ref={overlayRef}
         className={styles.layer}
-        data-enabled={enabled}
+        data-cursor={!enabled ? 'default' : showsBrush ? 'brush' : 'crosshair'}
         aria-label="Shared drawing board"
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
       />
+      {children}
+      {showsBrush && (
+        <div
+          ref={brushRef}
+          className={styles.brush}
+          data-visible="false"
+          aria-hidden="true"
+          style={{
+            width: brushSize,
+            height: brushSize,
+            margin: -brushSize / 2,
+            borderColor: settings.tool === 'erase' ? 'var(--ink-3)' : settings.strokeColor,
+          }}
+        />
+      )}
     </div>
   );
 }

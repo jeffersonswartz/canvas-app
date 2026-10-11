@@ -1,0 +1,75 @@
+.rail {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.tool:hover:not(:disabled) {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.tool[aria-checked='true'],
+.tool[aria-checked='true']:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.tool:disabled {
+  color: var(--line-strong);
+  cursor: not-allowed;
+}
+
+.danger:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.divider {
+  width: 24px;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .rail {
+    left: 10px;
+  }
+
+  .tool {
+    width: 38px;
+    height: 38px;
+  }
+}

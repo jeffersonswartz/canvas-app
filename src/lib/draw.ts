@@ -1,7 +1,7 @@
 import type { Point, Stroke } from '../../shared/protocol';
 
-/** The canvas background; the eraser paints with it. */
-export const BACKGROUND_COLOR = '#ffffff';
+/** The paper colour; erase previews are painted with it. Keep in sync with --paper. */
+export const PAPER_COLOR = '#fbfaf6';
 
 export interface Rect {
   x: number;
@@ -28,8 +28,18 @@ export function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-/** Draws one stroke onto a 2D context. */
-export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke): void {
+/**
+ * Draws one stroke onto a 2D context.
+ *
+ * Finished erase strokes cut the ink away (the canvas is transparent and the
+ * paper shows through). While a stroke is still a `preview` on the overlay
+ * there is nothing underneath to cut, so the eraser paints paper instead.
+ */
+export function drawStroke(
+  ctx: CanvasRenderingContext2D,
+  stroke: Stroke,
+  { preview = false } = {},
+): void {
   const [start] = stroke.points;
   if (!start) return;
   const end = stroke.points[stroke.points.length - 1] ?? start;
@@ -38,7 +48,11 @@ export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke): void 
   ctx.lineWidth = stroke.width;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
-  ctx.strokeStyle = stroke.tool === 'erase' ? BACKGROUND_COLOR : stroke.strokeColor;
+  ctx.strokeStyle = stroke.strokeColor;
+  if (stroke.tool === 'erase') {
+    if (preview) ctx.strokeStyle = PAPER_COLOR;
+    else ctx.globalCompositeOperation = 'destination-out';
+  }
   ctx.fillStyle = stroke.fillColor;
   ctx.beginPath();
 
@@ -79,7 +93,8 @@ export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke): void 
   ctx.restore();
 }
 
+/** Filled shapes are filled and then outlined, so both colours show. */
 function paintShape(ctx: CanvasRenderingContext2D, fill: boolean) {
   if (fill) ctx.fill();
-  else ctx.stroke();
+  ctx.stroke();
 }

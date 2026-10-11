@@ -44,6 +44,9 @@ export type StrokeExtend = z.infer<typeof strokeExtendSchema>;
 
 export const strokeEndSchema = z.object({ id: strokeId });
 
+/** Where a user's pointer is on the board, or `null` when it left. */
+export const cursorSchema = pointSchema.nullable();
+
 export const userNameSchema = z.string().trim().min(1).max(MAX_NAME_LENGTH);
 
 export interface User {
@@ -73,6 +76,7 @@ export interface ServerToClientEvents {
   'stroke:extend': (update: StrokeExtend & { userId: string }) => void;
   'stroke:end': (end: { id: string; userId: string }) => void;
   'board:clear': () => void;
+  cursor: (cursor: { userId: string; point: Point | null }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -82,6 +86,7 @@ export interface ClientToServerEvents {
   'stroke:extend': (update: StrokeExtend) => void;
   'stroke:end': (end: { id: string }) => void;
   'board:clear': () => void;
+  cursor: (point: Point | null) => void;
 }
 
 /**

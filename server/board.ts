@@ -1,15 +1,16 @@
 import { extendStroke } from '../shared/protocol.js';
 import type { BoardSnapshot, OwnedStroke, Point, Stroke, User } from '../shared/protocol.js';
 
+// Mid-tone inks that keep white initials readable and stay distinct side by side.
 export const USER_COLORS = [
-  '#ff9800',
-  '#e91e63',
-  '#9c27b0',
-  '#3f51b5',
-  '#03a9f4',
-  '#009688',
-  '#8bc34a',
-  '#795548',
+  '#d9472b',
+  '#2f5bd3',
+  '#1f7a6d',
+  '#a86b0c',
+  '#8a3f8f',
+  '#4f7d3a',
+  '#b83266',
+  '#4b5563',
 ];
 
 export const DEFAULT_MAX_STROKES = 5_000;

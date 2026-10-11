@@ -5,21 +5,34 @@
 Canvas App is a collaborative drawing board: everyone who opens the page draws on the same canvas,
 and strokes appear in each other's browsers in real time.
 
-- Freehand pen, line, circle, square and eraser tools
-- Stroke colour, fill colour, fill toggle and stroke width
-- Live list of who is online
+- Pen, line, circle, square and eraser tools, with keyboard shortcuts
+- A palette of eight inks plus a custom colour picker, separate stroke and fill colours, and five
+  brush sizes
+- Live cursors with name tags for everyone else on the board
 - People who join late see the whole drawing
-- Works with a mouse, pen or touch screen
+- Works with a mouse, pen or touch screen, on desktop and phone layouts
 - "Clear board" wipes the canvas for everyone
+
+### Keyboard shortcuts
+
+| Key       | Action                 |
+| --------- | ---------------------- |
+| `P`       | Pen                    |
+| `L`       | Line                   |
+| `O`       | Circle                 |
+| `S`       | Square                 |
+| `E`       | Eraser                 |
+| `F`       | Toggle fill            |
+| `[` / `]` | Smaller / larger brush |
 
 ## Tech stack
 
-| Part   | Tools                                                                     |
-| ------ | ------------------------------------------------------------------------- |
-| Client | React 19, TypeScript, Vite, CSS Modules, `socket.io-client`, lucide icons |
-| Server | Node.js, Express 5, Socket.IO 4, zod (validates every incoming message)   |
-| Tests  | Vitest, Testing Library, a real Socket.IO server for integration tests    |
-| Checks | ESLint (typescript-eslint, react-hooks), Prettier, GitHub Actions CI      |
+| Part   | Tools                                                                                                                   |
+| ------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Client | React 19, TypeScript, Vite, CSS Modules, `socket.io-client`, lucide icons, self-hosted Geist and Instrument Serif fonts |
+| Server | Node.js, Express 5, Socket.IO 4, zod (validates every incoming message)                                                 |
+| Tests  | Vitest, Testing Library, a real Socket.IO server for integration tests                                                  |
+| Checks | ESLint (typescript-eslint, react-hooks), Prettier, GitHub Actions CI                                                    |
 
 ## Getting started
 
@@ -101,14 +114,20 @@ server/
   socket.ts             Socket.IO event handlers (validation, broadcasting)
   index.ts              Express + Socket.IO entry point
 src/
-  App.tsx               Layout, tool settings, join/logout
+  App.tsx               Layout, tool settings, join/leave
+  index.css             Design tokens (colours, type, shadows) and tooltips
   components/
-    DrawingCanvas.tsx   Pointer input, sending strokes, mirroring remote strokes
-    Toolbar.tsx         Tools, colours, width, clear
-    OnlineUsers.tsx     Online avatars
-    JoinDialog.tsx      Name prompt
+    DrawingCanvas.tsx   Pointer input, brush preview, sending strokes and cursor
+    RemoteCursors.tsx   Other people's cursors with name tags
+    ToolRail.tsx        Tool picker and clear board (left)
+    StyleBar.tsx        Colours, fill and brush size (bottom)
+    TopBar.tsx          Wordmark, connection status, people, leave
+    OnlineUsers.tsx     Stacked avatars
+    JoinDialog.tsx      Name prompt showing who is already drawing
   hooks/
     usePresence.ts      Online users, joining on (re)connect
+    useRemoteCursors.ts Other people's cursor positions
+    useToolShortcuts.ts Keyboard shortcuts
     useStoredName.ts    Name kept in sessionStorage for the tab
   lib/
     BoardRenderer.ts    Two-layer canvas renderer
@@ -128,7 +147,10 @@ Drawings are sent as **strokes** (tool, colours, width and points), not pixels.
    can draw at once without their lines joining up.
 3. On connecting, a client receives a `snapshot` of the users, all finished strokes (up to the most
    recent 5,000) and any strokes in progress.
-4. The client draws on two stacked canvases. Finished strokes go on the bottom layer. Strokes still
+4. Cursor positions are sent at most once per frame and relayed as volatile messages: a slow
+   connection drops stale positions instead of queueing them.
+5. The client draws on two stacked transparent canvases over a CSS dot-grid "paper", so the
+   eraser cuts ink away and the paper shows through. Finished strokes go on the bottom layer. Strokes still
    being drawn are redrawn on the top layer each frame, so shape previews never smudge the drawing.
    Because strokes are data, resizing the window redraws a sharp image, including on HiDPI screens.
 

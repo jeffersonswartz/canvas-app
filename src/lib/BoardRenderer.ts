@@ -1,11 +1,12 @@
 import { extendStroke } from '../../shared/protocol';
 import type { Point, Stroke } from '../../shared/protocol';
-import { BACKGROUND_COLOR, drawStroke } from './draw';
+import { drawStroke } from './draw';
 
 /**
  * Draws the board onto two stacked canvases:
  *
- * - `base` holds finished strokes. New strokes are painted on top
+ * - `base` holds finished strokes on a transparent background (the paper is
+ *   CSS underneath). New strokes are painted on top
  *   incrementally; the whole layer is only repainted on resize or reset.
  * - `overlay` holds strokes still being drawn (by anyone). It is cleared and
  *   repainted once per animation frame while something changes, so live
@@ -88,10 +89,7 @@ export class BoardRenderer {
 
   private repaintBase(): void {
     const ctx = this.baseCtx;
-    ctx.save();
-    ctx.fillStyle = BACKGROUND_COLOR;
-    ctx.fillRect(0, 0, this.width, this.height);
-    ctx.restore();
+    ctx.clearRect(0, 0, this.width, this.height);
     for (const stroke of this.strokes) drawStroke(ctx, stroke);
   }
 
@@ -105,7 +103,9 @@ export class BoardRenderer {
 
   private repaintOverlay(): void {
     this.overlayCtx.clearRect(0, 0, this.width, this.height);
-    for (const stroke of this.active.values()) drawStroke(this.overlayCtx, stroke);
+    for (const stroke of this.active.values()) {
+      drawStroke(this.overlayCtx, stroke, { preview: true });
+    }
   }
 }
 
