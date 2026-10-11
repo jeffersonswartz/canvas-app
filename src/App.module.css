@@ -1,0 +1,61 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: #fff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.status {
+  margin: 0;
+  padding: 0.4rem 1rem;
+  background: #fff3cd;
+  color: #664d03;
+  font-size: 0.9rem;
+}
+
+.board {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+}

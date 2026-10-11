@@ -1,0 +1,61 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.45);
+  z-index: 10;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(400px, 100%);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.field input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.error {
+  margin: -0.5rem 0 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.submit {
+  align-self: flex-end;
+  padding: 0.55rem 1.25rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}

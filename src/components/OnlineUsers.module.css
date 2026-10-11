@@ -1,0 +1,29 @@
+.online {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heading {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.list {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 600;
+  border: 2px solid rgb(255 255 255 / 0.8);
+}

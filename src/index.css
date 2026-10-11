@@ -1,0 +1,47 @@
+:root {
+  --primary: #3f51b5;
+  --accent: #e91e63;
+  --accent-soft: rgb(233 30 99 / 0.12);
+  --danger: #d32f2f;
+  --surface: #ffffff;
+  --background: #eceff1;
+  --border: #dfe3e8;
+  --hover: rgb(0 0 0 / 0.06);
+  --text: #212121;
+  --text-muted: #5f6368;
+  --radius: 8px;
+  --shadow: 0 2px 6px rgb(0 0 0 / 0.15);
+
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color: var(--text);
+  background: var(--background);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

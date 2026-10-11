@@ -1,0 +1,75 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding-right: 1rem;
+  border-right: 1px solid var(--border);
+}
+
+.button {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.button[aria-checked='true'],
+.button[aria-pressed='true'] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.danger:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+.color {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.color input {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.value {
+  min-width: 2ch;
+  font-variant-numeric: tabular-nums;
+}
