@@ -51,6 +51,34 @@ Environment variables:
 The client always connects to the server that served the page, so no URL needs configuring.
 `GET /healthz` returns `{ "ok": true }` for load balancer health checks.
 
+## Deployment
+
+The app needs a host that runs a long-lived Node.js process with WebSockets. Static hosts
+(GitHub Pages, Netlify, Vercel) won't work. The drawing is kept in server memory, so **run exactly
+one instance**. Several instances would each have their own separate board.
+
+### Render (simplest)
+
+The repo includes a [`render.yaml`](render.yaml) Blueprint.
+
+1. Sign in at [render.com](https://render.com) with GitHub.
+2. **New → Blueprint**, pick this repository and the branch to deploy, then **Apply**.
+3. Render builds with `npm ci --include=dev && npm run build`, starts with `npm start`, and checks
+   `/healthz`. Every push to that branch deploys again.
+
+On the free plan the service sleeps after about 15 minutes without traffic. The first visit after
+that takes a while to wake it up, and the board starts empty again.
+
+### Any Docker host (Fly.io, Railway, Google Cloud Run, a VPS…)
+
+```sh
+docker build -t canvas-app .
+docker run -p 3000:3000 canvas-app
+```
+
+The image listens on `$PORT` (default 3000) and runs as a non-root user. On Cloud Run, set the
+maximum number of instances to 1 so everyone shares one board.
+
 ## Scripts
 
 | Script                      | What it does                          |
